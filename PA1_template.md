@@ -18,7 +18,7 @@ str(data)
 
 ## What is mean total number of steps taken per day?
 
-Calcualte the sum of steps for each day:
+Calculate the sum of steps for each day:
 
 ```r
 stepsPerDay <- tapply(data$steps, data$date, sum, na.rm =TRUE)
@@ -33,29 +33,60 @@ hist(stepsPerDay)
 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
 
-The mean of steps taken each day is
+###Mean
+To calculate the mean of the data, we simply run:
 
 ```r
-mean(stepsPerDay)
+meanSteps <- mean(stepsPerDay)
 ```
+and see that the mean is 9354.2295082.  
 
-```
-## [1] 9354.23
-```
-
-And the median is
+###Median
+The median is calculated simillarly by running:
 
 ```r
-median(stepsPerDay)
+medianSteps <- median(stepsPerDay)
 ```
 
-```
-## [1] 10395
-```
+Which shows that the median is 10395.
 
 ## What is the average daily activity pattern?
+First, we create an array of the averages of each 5-minute interval
+over all the obersvations.
+We then plot this data to get an overview.
 
 
+```r
+intervalAvgs <- tapply(data$steps, data$interval, mean, na.rm = TRUE)
+plot(names(intervalAvgs), intervalAvgs, type="l")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
+
+We can see from the plot that the maximum value is somewhere between 0700 and 1000.
+To get the exact result, we can run
+
+
+```r
+which.max(intervalAvgs)
+```
+
+```
+## 835 
+## 104
+```
+and see that the interval "835", which is the 104th element in the *internalAvgs* array,
+contains the maximum number of steps.
+To get the actual number, we simply acces this element:
+
+```r
+intervalAvgs[104]
+```
+
+```
+##      835 
+## 206.1698
+```
 
 ## Imputing missing values
 

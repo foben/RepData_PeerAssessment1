@@ -7,7 +7,7 @@ output:
 
 
 ## Loading and preprocessing the data
-```{r, echo = TRUE}
+```{r}
 data <- read.csv("activity.csv", header = TRUE)
 str(data)
 ```
@@ -15,30 +15,54 @@ str(data)
 
 ## What is mean total number of steps taken per day?
 
-Calcualte the sum of steps for each day:
-```{r, echo = TRUE}
+Calculate the sum of steps for each day:
+```{r}
 stepsPerDay <- tapply(data$steps, data$date, sum, na.rm =TRUE)
 ```
 
 Plot a histogram of this data:
 
-```{r, echo = TRUE}
+```{r}
 hist(stepsPerDay)
 ```
 
-The mean of steps taken each day is
-```{r, echo = TRUE}
-mean(stepsPerDay)
+###Mean
+To calculate the mean of the data, we simply run:
+```{r}
+meanSteps <- mean(stepsPerDay)
+```
+and see that the mean is `r meanSteps`.  
+
+###Median
+The median is calculated simillarly by running:
+```{r}
+medianSteps <- median(stepsPerDay)
 ```
 
-And the median is
-```{r, echo = TRUE}
-median(stepsPerDay)
-```
+Which shows that the median is `r medianSteps`.
 
 ## What is the average daily activity pattern?
+First, we create an array of the averages of each 5-minute interval
+over all the obersvations.
+We then plot this data to get an overview.
 
+```{r}
+intervalAvgs <- tapply(data$steps, data$interval, mean, na.rm = TRUE)
+plot(names(intervalAvgs), intervalAvgs, type="l")
+```
 
+We can see from the plot that the maximum value is somewhere between 0700 and 1000.
+To get the exact result, we can run
+
+```{r}
+which.max(intervalAvgs)
+```
+and see that the interval "835", which is the 104th element in the *internalAvgs* array,
+contains the maximum number of steps.
+To get the actual number, we simply acces this element:
+```{r}
+intervalAvgs[104]
+```
 
 ## Imputing missing values
 
