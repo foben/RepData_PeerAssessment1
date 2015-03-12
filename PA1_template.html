@@ -103,13 +103,40 @@ plot(names(intervalAvgs), intervalAvgs, type=&quot;l&quot;)</code></pre>
 <pre class="r"><code>which.max(intervalAvgs)</code></pre>
 <pre><code>## 835 
 ## 104</code></pre>
-<p>and see that the interval “835”, which is the 104th element in the <em>internalAvgs</em> array, contains the maximum number of steps. To get the actual number, we simply acces this element:</p>
+<p>and see that the interval “835”, which is the 104th element in the <em>internalAvgs</em> array, contains the maximum number of steps. To get the actual number, we simply acces this element</p>
 <pre class="r"><code>intervalAvgs[104]</code></pre>
 <pre><code>##      835 
 ## 206.1698</code></pre>
+<p>and see that the maximum average number of steps is 206.1698</p>
 </div>
 <div id="imputing-missing-values" class="section level2">
 <h2>Imputing missing values</h2>
+<p>To count the number of missing values, we create a logical vector that is TRUE for NA values. We then sum it up, utilizing the fact that TRUE is represented as 1.</p>
+<pre class="r"><code>missing &lt;- sum(is.na(data$steps))</code></pre>
+<p>We can see that there are 2304 missing values, which is about 13.11% of the datapoints.</p>
+<p>To impute <em>NA</em> values, we iterate over the rows of the data frame. When we encounter an <em>NA</em> value in the “steps” column, we look up this value from the <em>intervalAvgs</em> vector, using the name of the required interval.</p>
+<pre class="r"><code>#Create a copy of the original data
+correctedData &lt;- data.frame(data)
+for (i in 1:nrow(correctedData)) {
+  if(is.na(correctedData[i, &quot;steps&quot;])) {
+    #Get a String that represents the current interval
+    interval &lt;- as.character( correctedData[i, &quot;interval&quot;] )
+    #lookup the average of that interval and replace the NA value 
+    correctedData[i, &quot;steps&quot;] &lt;- intervalAvgs[ interval ]
+  }
+}</code></pre>
+<p>We calculate the daily sums of the corrected data and apply the mean and meadian functions to the result, just like before:</p>
+<pre class="r"><code>correctedStepsPerDay &lt;- tapply(correctedData$steps, correctedData$date, sum, na.rm = TRUE)
+correctedMeanSteps &lt;- mean(correctedStepsPerDay)
+correctedMedianSteps &lt;- median(correctedStepsPerDay) </code></pre>
+<p>We can combine the old and new data into a little comparison dataframe:</p>
+<pre class="r"><code>comparison &lt;- data.frame(c(meanSteps, correctedMeanSteps), c(medianSteps, correctedMedianSteps))
+names(comparison) &lt;- c(&quot;mean&quot;, &quot;median&quot;)
+row.names(comparison) &lt;- c(&quot;old&quot;, &quot;new&quot;)
+comparison</code></pre>
+<pre><code>##         mean   median
+## old  9354.23 10395.00
+## new 10766.19 10766.19</code></pre>
 </div>
 <div id="are-there-differences-in-activity-patterns-between-weekdays-and-weekends" class="section level2">
 <h2>Are there differences in activity patterns between weekdays and weekends?</h2>

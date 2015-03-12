@@ -77,7 +77,7 @@ which.max(intervalAvgs)
 ```
 and see that the interval "835", which is the 104th element in the *internalAvgs* array,
 contains the maximum number of steps.
-To get the actual number, we simply acces this element:
+To get the actual number, we simply acces this element
 
 ```r
 intervalAvgs[104]
@@ -87,8 +87,58 @@ intervalAvgs[104]
 ##      835 
 ## 206.1698
 ```
+and see that the maximum average number of steps is 206.1698
+
 
 ## Imputing missing values
+To count the number of missing values, we create a logical vector that is TRUE for NA values.
+We then sum it up, utilizing the fact that TRUE is represented as 1.
+
+```r
+missing <- sum(is.na(data$steps))
+```
+We can see that there are 2304 missing values, which is about 13.11% of the datapoints.
+
+To impute *NA* values, we iterate over the rows of the data frame.
+When we encounter an *NA* value in the "steps" column, we look up this value
+from the *intervalAvgs* vector, using the name of the required interval.
+
+```r
+#Create a copy of the original data
+correctedData <- data.frame(data)
+for (i in 1:nrow(correctedData)) {
+  if(is.na(correctedData[i, "steps"])) {
+    #Get a String that represents the current interval
+    interval <- as.character( correctedData[i, "interval"] )
+    #lookup the average of that interval and replace the NA value 
+    correctedData[i, "steps"] <- intervalAvgs[ interval ]
+  }
+}
+```
+
+We calculate the daily sums of the corrected data and apply the mean and meadian functions to
+the result, just like before:
+
+```r
+correctedStepsPerDay <- tapply(correctedData$steps, correctedData$date, sum, na.rm = TRUE)
+correctedMeanSteps <- mean(correctedStepsPerDay)
+correctedMedianSteps <- median(correctedStepsPerDay) 
+```
+We can combine the old and new data into a little comparison dataframe:
+
+```r
+comparison <- data.frame(c(meanSteps, correctedMeanSteps), c(medianSteps, correctedMedianSteps))
+names(comparison) <- c("mean", "median")
+row.names(comparison) <- c("old", "new")
+comparison
+```
+
+```
+##         mean   median
+## old  9354.23 10395.00
+## new 10766.19 10766.19
+```
+
 
 
 
