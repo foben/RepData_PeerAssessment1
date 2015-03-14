@@ -124,7 +124,31 @@ correctedStepsPerDay <- tapply(correctedData$steps, correctedData$date, sum, na.
 correctedMeanSteps <- mean(correctedStepsPerDay)
 correctedMedianSteps <- median(correctedStepsPerDay) 
 ```
-We can combine the old and new data into a little comparison dataframe:
+
+The histogram of the corrected data looks like this:
+
+```r
+hist(correctedStepsPerDay)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
+
+Let's have a look at the original and corrected histograms side-by-side.
+
+```r
+par(mfrow=c(1, 2))
+hist(stepsPerDay)
+hist(correctedStepsPerDay)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-13-1.png) 
+
+```r
+par(mfrow=c(1, 1))
+```
+
+We can see that the new histogram is more balanced and that the frequency for the lowest bin
+is now smaller. To compare the mean and median, we can combine the old and new data into a little comparison dataframe:
 
 ```r
 comparison <- data.frame(c(meanSteps, correctedMeanSteps), c(medianSteps, correctedMedianSteps))
@@ -139,7 +163,47 @@ comparison
 ## new 10766.19 10766.19
 ```
 
-
-
+Here we can see that both the mean and the median have increased for the corrected data.
 
 ## Are there differences in activity patterns between weekdays and weekends?
+To answer this question, we need to decide for every observation,
+if it was on a weekday or on the weekend and add this information to the dataframe.
+
+
+```r
+#Convertg the *date* column to the Date type
+correctedData$date <- as.Date(correctedData$date)
+#Create a vector of the days from the dates
+days <- weekdays(correctedData$date)
+#Create a character vector representing the type of day
+daytype <- ifelse(days %in% c("Saturday", "Sunday"), "weekend", "weekday")
+#Convert it to a factor and 'attach' it to the data
+correctedData <- cbind(correctedData, daytype)
+```
+
+With the *daytype* column added to the corrected data,
+we can calculate the interval averages seperated by weekday and weekend.
+We do this by using the *aggregate* function.
+Aggregate works similar to *tapply*, but returns a dataframe instead.
+We just need to adjust the column names afterwards.
+
+
+```r
+byDaytypeData <- with(correctedData, aggregate(steps, list(interval, daytype), mean) )
+names(byDaytypeData) <- c("interval", "daytype", "steps")
+library(lattice)
+xyplot(steps ~ interval | daytype, data=byDaytypeData, type="l", layout=c(1,2))
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-16-1.png) 
+
+
+
+
+
+
+
+
+
+
+
