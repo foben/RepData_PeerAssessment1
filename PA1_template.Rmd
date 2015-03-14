@@ -7,20 +7,28 @@ output:
 
 
 ## Loading and preprocessing the data
+The data is in csv format, so we simply use the read.csv function to read the data
+into a dataframe.
+We specify that there are headers, so that we get the proper column names.
+We can examine the resulting data frame with the *str* function.
 ```{r}
 data <- read.csv("activity.csv", header = TRUE)
 str(data)
 ```
 
+The resulting dataset contains two int and one factor variable and a total of 17568 observations.
+The *date* variable contains the date of the observations and was interpreted as a factor with 61 levels.
+We must be aware that there exist missing values (*NA*) within the *steps* data.
+
 
 ## What is mean total number of steps taken per day?
+To get the sum of steps, seperated by day, we run the *tapply* function on the data, grouping it by the *date* column. 
 
-Calculate the sum of steps for each day:
 ```{r}
 stepsPerDay <- tapply(data$steps, data$date, sum, na.rm =TRUE)
 ```
 
-Plot a histogram of this data:
+We use the *hist* function to plot a histogram of average steps per day.
 
 ```{r}
 hist(stepsPerDay)
@@ -30,13 +38,15 @@ hist(stepsPerDay)
 To calculate the mean of the data, we simply run:
 ```{r}
 meanSteps <- mean(stepsPerDay)
+meanSteps
 ```
-and see that the mean is `r meanSteps`.  
+and see that the mean steps taken each day is `r meanSteps`.  
 
 ###Median
 The median is calculated simillarly by running:
 ```{r}
 medianSteps <- median(stepsPerDay)
+medianSteps
 ```
 
 Which shows that the median is `r medianSteps`.
@@ -52,19 +62,15 @@ plot(names(intervalAvgs), intervalAvgs, type="l")
 ```
 
 We can see from the plot that the maximum value is somewhere between 0700 and 1000.
-To get the exact result, we can run
+To get the exact result, we use the *which.max* to get the index of the maximum and
+then look that value up.
 
 ```{r}
-which.max(intervalAvgs)
+maxSteps <- intervalAvgs[which.max(intervalAvgs)]
+maxSteps
 ```
-and see that the interval "835", which is the 104th element in the *internalAvgs* array,
-contains the maximum number of steps.
-To get the actual number, we simply acces this element
-```{r}
-intervalAvgs[104]
-```
-and see that the maximum average number of steps is 206.1698
-
+We see that the interval with the maximum average steps is the `r names(maxSteps)[1]` interval with
+an average of `r round(unname(maxSteps), digits=4)` steps.
 
 ## Imputing missing values
 To count the number of missing values, we create a logical vector that is TRUE for NA values.
@@ -108,6 +114,8 @@ Let's have a look at the original and corrected histograms side-by-side.
 par(mfrow=c(1, 2))
 hist(stepsPerDay)
 hist(correctedStepsPerDay)
+```
+```{r echo=FALSE}
 par(mfrow=c(1, 1))
 ```
 
@@ -146,10 +154,20 @@ We just need to adjust the column names afterwards.
 ```{r}
 byDaytypeData <- with(correctedData, aggregate(steps, list(interval, daytype), mean) )
 names(byDaytypeData) <- c("interval", "daytype", "steps")
+```
+
+The *byDaytypeData* dataframe contains two observations for each interval,
+one with the weekday average and one with the weekend average.
+We use the lattice plotting system here to plot the average steps for each interval,
+seperated by the daytype factor variable.
+
+```{r}
 library(lattice)
 xyplot(steps ~ interval | daytype, data=byDaytypeData, type="l", layout=c(1,2))
 ```
 
+The plots show that the spike in the morning on weekend dayss is not as distinct
+as on weekdays and that more steps are taken at noon and in the early afternoon.
 
 
 

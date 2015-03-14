@@ -2,6 +2,10 @@
 
 
 ## Loading and preprocessing the data
+The data is in csv format, so we simply use the read.csv function to read the data
+into a dataframe.
+We specify that there are headers, so that we get the proper column names.
+We can examine the resulting data frame with the *str* function.
 
 ```r
 data <- read.csv("activity.csv", header = TRUE)
@@ -15,16 +19,20 @@ str(data)
 ##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
+The resulting dataset contains two int and one factor variable and a total of 17568 observations.
+The *date* variable contains the date of the observations and was interpreted as a factor with 61 levels.
+We must be aware that there exist missing values (*NA*) within the *steps* data.
+
 
 ## What is mean total number of steps taken per day?
+To get the sum of steps, seperated by day, we run the *tapply* function on the data, grouping it by the *date* column. 
 
-Calculate the sum of steps for each day:
 
 ```r
 stepsPerDay <- tapply(data$steps, data$date, sum, na.rm =TRUE)
 ```
 
-Plot a histogram of this data:
+We use the *hist* function to plot a histogram of average steps per day.
 
 
 ```r
@@ -38,14 +46,24 @@ To calculate the mean of the data, we simply run:
 
 ```r
 meanSteps <- mean(stepsPerDay)
+meanSteps
 ```
-and see that the mean is 9354.2295082.  
+
+```
+## [1] 9354.23
+```
+and see that the mean steps taken each day is 9354.2295082.  
 
 ###Median
 The median is calculated simillarly by running:
 
 ```r
 medianSteps <- median(stepsPerDay)
+medianSteps
+```
+
+```
+## [1] 10395
 ```
 
 Which shows that the median is 10395.
@@ -64,31 +82,21 @@ plot(names(intervalAvgs), intervalAvgs, type="l")
 ![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
 
 We can see from the plot that the maximum value is somewhere between 0700 and 1000.
-To get the exact result, we can run
+To get the exact result, we use the *which.max* to get the index of the maximum and
+then look that value up.
 
 
 ```r
-which.max(intervalAvgs)
-```
-
-```
-## 835 
-## 104
-```
-and see that the interval "835", which is the 104th element in the *internalAvgs* array,
-contains the maximum number of steps.
-To get the actual number, we simply acces this element
-
-```r
-intervalAvgs[104]
+maxSteps <- intervalAvgs[which.max(intervalAvgs)]
+maxSteps
 ```
 
 ```
 ##      835 
 ## 206.1698
 ```
-and see that the maximum average number of steps is 206.1698
-
+We see that the interval with the maximum average steps is the 835 interval with
+an average of 206.1698 steps.
 
 ## Imputing missing values
 To count the number of missing values, we create a logical vector that is TRUE for NA values.
@@ -131,7 +139,7 @@ The histogram of the corrected data looks like this:
 hist(correctedStepsPerDay)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png) 
 
 Let's have a look at the original and corrected histograms side-by-side.
 
@@ -141,11 +149,8 @@ hist(stepsPerDay)
 hist(correctedStepsPerDay)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-13-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
 
-```r
-par(mfrow=c(1, 1))
-```
 
 We can see that the new histogram is more balanced and that the frequency for the lowest bin
 is now smaller. To compare the mean and median, we can combine the old and new data into a little comparison dataframe:
@@ -191,12 +196,23 @@ We just need to adjust the column names afterwards.
 ```r
 byDaytypeData <- with(correctedData, aggregate(steps, list(interval, daytype), mean) )
 names(byDaytypeData) <- c("interval", "daytype", "steps")
+```
+
+The *byDaytypeData* dataframe contains two observations for each interval,
+one with the weekday average and one with the weekend average.
+We use the lattice plotting system here to plot the average steps for each interval,
+seperated by the daytype factor variable.
+
+
+```r
 library(lattice)
 xyplot(steps ~ interval | daytype, data=byDaytypeData, type="l", layout=c(1,2))
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-16-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-17-1.png) 
 
+The plots show that the spike in the morning on weekend dayss is not as distinct
+as on weekdays and that more steps are taken at noon and in the early afternoon.
 
 
 
