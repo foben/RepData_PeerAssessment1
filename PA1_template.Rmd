@@ -31,7 +31,7 @@ stepsPerDay <- tapply(data$steps, data$date, sum, na.rm =TRUE)
 We use the *hist* function to plot a histogram of average steps per day.
 
 ```{r}
-hist(stepsPerDay)
+hist(stepsPerDay, xlab="average steps per day")
 ```
 
 ###Mean
@@ -58,7 +58,7 @@ We then plot this data to get an overview.
 
 ```{r}
 intervalAvgs <- tapply(data$steps, data$interval, mean, na.rm = TRUE)
-plot(names(intervalAvgs), intervalAvgs, type="l")
+plot(names(intervalAvgs), intervalAvgs, type="l", xlab="Interval", ylab="Average steps")
 ```
 
 We can see from the plot that the maximum value is somewhere between 0700 and 1000.
@@ -106,14 +106,14 @@ correctedMedianSteps <- median(correctedStepsPerDay)
 
 The histogram of the corrected data looks like this:
 ```{r}
-hist(correctedStepsPerDay)
+hist(correctedStepsPerDay, xlab="average steps per day")
 ```
 
 Let's have a look at the original and corrected histograms side-by-side.
 ```{r fig.width=12}
 par(mfrow=c(1, 2))
-hist(stepsPerDay)
-hist(correctedStepsPerDay)
+hist(stepsPerDay, xlab="average steps per day")
+hist(correctedStepsPerDay, xlab="average steps per day")
 ```
 ```{r echo=FALSE}
 par(mfrow=c(1, 1))

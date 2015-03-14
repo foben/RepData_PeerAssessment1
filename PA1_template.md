@@ -36,7 +36,7 @@ We use the *hist* function to plot a histogram of average steps per day.
 
 
 ```r
-hist(stepsPerDay)
+hist(stepsPerDay, xlab="average steps per day")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
@@ -76,7 +76,7 @@ We then plot this data to get an overview.
 
 ```r
 intervalAvgs <- tapply(data$steps, data$interval, mean, na.rm = TRUE)
-plot(names(intervalAvgs), intervalAvgs, type="l")
+plot(names(intervalAvgs), intervalAvgs, type="l", xlab="Interval", ylab="Average steps")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
@@ -136,7 +136,7 @@ correctedMedianSteps <- median(correctedStepsPerDay)
 The histogram of the corrected data looks like this:
 
 ```r
-hist(correctedStepsPerDay)
+hist(correctedStepsPerDay, xlab="average steps per day")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-11-1.png) 
@@ -145,8 +145,8 @@ Let's have a look at the original and corrected histograms side-by-side.
 
 ```r
 par(mfrow=c(1, 2))
-hist(stepsPerDay)
-hist(correctedStepsPerDay)
+hist(stepsPerDay, xlab="average steps per day")
+hist(correctedStepsPerDay, xlab="average steps per day")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
